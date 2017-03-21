@@ -227,6 +227,7 @@ topic_analysis_time.prototype = {   //获取数据，重新画表
   Draw_blog_scan_area: function(data){
   	// $('#blog_time').empty();
   	// $('#blog_time').remove();
+  	console.log(data);
   	$('#blog_scan_area_time').empty();
   	// document.getElementById("blog_time").parentNode.removeChild(document.getElementById("blog_time"));
     

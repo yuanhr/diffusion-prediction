@@ -360,28 +360,82 @@ function create_task(data){
 }
 
 $("#build_inf").on('click',function(){
-    console.log('123');
-    var task_name = $("#new_task").val();
-    var start_time = Date.parse(new Date($('.start').val())).toString().substr(0,10);
-    var stop_time = Date.parse(new Date($('.end').val())).toString().substr(0,10);
-    var interfer_during = $("#inter_time").val();
-    var remark = $("#remarks").val();
-    var must_keywords = $("#key-1").val();
-    var should_keywords = $("#key-2").val();
-    console.log(interfer_during);
     
-    var create_task_url = '/interfere/create_interfere_task/?task_name='+task_name+
-    '&start_time='+start_time+'&stop_time='+stop_time+'&interfer_during='+interfer_during+
-    '&remark='+remark+'&must_keywords='+must_keywords+'&should_keywords='+should_keywords+'&submit_user='+'admin@qq.com';
-    console.log(create_task_url);
-    // console.log(create_task_url);
-    $.ajax({
-        url: create_task_url,
-        type: 'GET',
-        dataType: 'json',
-        async: true,
-        success:create_task
-    });
+    choose_data = $('#optional_task').bootstrapTable('getAllSelections');
+    console.log(choose_data);
+
+    if(choose_data.length){
+        for(var i=0;i<choose_data.length;i++){
+            var task_name = choose_data[i].task_name;
+            var start_time = choose_data[i].start_time;
+            var stop_time = choose_data[i].stop_time;
+            var remark = choose_data[i].remark;
+            var must_keywords = choose_data[i].must_keywords;
+            var should_keywords = choose_data[i].should_keywords;
+            var interfer_during = $("#inter_time").val();
+          
+            if ( $("#new_task").val()){
+                task_name = $("#new_task").val();
+                console.log("新的任务名称");
+                console.log(task_name);
+            }
+          
+            if( Date.parse(new Date($('.start').val())).toString().substr(0,10) != 'NaN'){
+                console.log('开始时间');
+                start_time = Date.parse(new Date($('.start').val())).toString().substr(0,10);
+            }
+            if( Date.parse(new Date($('.end').val())).toString().substr(0,10) != 'NaN'){
+                stop_time = Date.parse(new Date($('.end').val())).toString().substr(0,10);
+            }
+
+            if( $("#remarks").val() ){
+                remark = $("#remarks").val();
+            }
+
+            if( $("#key-1").val()){
+                must_keywords = $("#key-1").val();
+            }
+            if( $("#key-2").val()){
+                should_keywords = $("#key-2").val();
+            }
+
+            var create_task_url = '/interfere/create_interfere_task/?task_name='+task_name+
+            '&start_time='+start_time+'&stop_time='+stop_time+'&interfer_during='+interfer_during+
+            '&remark='+remark+'&must_keywords='+must_keywords+'&should_keywords='+should_keywords+'&submit_user='+'admin@qq.com';
+            console.log(create_task_url);
+            // console.log(create_task_url);
+            $.ajax({
+                url: create_task_url,
+                type: 'GET',
+                dataType: 'json',
+                async: true,
+                success:create_task
+            });
+        }
+    }else{
+        var task_name = $("#new_task").val();
+        var start_time = Date.parse(new Date($('.start').val())).toString().substr(0,10);
+        var stop_time = Date.parse(new Date($('.end').val())).toString().substr(0,10);
+        var interfer_during = $("#inter_time").val();
+        var remark = $("#remarks").val();
+        var must_keywords = $("#key-1").val();
+        var should_keywords = $("#key-2").val();
+        console.log(interfer_during);
+        
+        var create_task_url = '/interfere/create_interfere_task/?task_name='+task_name+
+        '&start_time='+start_time+'&stop_time='+stop_time+'&interfer_during='+interfer_during+
+        '&remark='+remark+'&must_keywords='+must_keywords+'&should_keywords='+should_keywords+'&submit_user='+'admin@qq.com';
+        console.log(create_task_url);
+        // console.log(create_task_url);
+        $.ajax({
+            url: create_task_url,
+            type: 'GET',
+            dataType: 'json',
+            async: true,
+            success:create_task
+        });
+    }
+    
 })
 
 //新建任务---完----
@@ -399,10 +453,14 @@ function delete_task_inf(data){
     }
 }
 
+function confirm_delete(){
+    return confirm("确定要删除吗？")
+}
+
 function delete_task_outter_inf(task_name){
 
     var delete_task_inf_url = '/interfere/delete_task/?task_name='+task_name;
-
+    confirm_delete();
     console.log(delete_task_inf_url);
     $.ajax({
         url: delete_task_inf_url,

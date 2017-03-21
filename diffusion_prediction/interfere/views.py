@@ -155,6 +155,7 @@ def ajax_get_current_hot_weibo():
     task_name = request.args.get('task_name','')
     update_time = request.args.get("update_time","")
     pinyin_task_name = pinyin.get(task_name.encode('utf-8'), format='strip', delimiter="_")
+    sort_item = request.args.get('sort_item','')
     index_name = "stimulation_"+pinyin_task_name
     index_type = "stimulation_results"
     es_results = es_prediction.get(index=index_name, doc_type=index_type, id=update_time)["_source"]
@@ -168,7 +169,13 @@ def ajax_get_current_hot_weibo():
             new_dict[item] =each[item]
         return_list.append(new_dict)
 
-    return json.dumps(return_list)
+    if sort_item == 'time' :
+        results_sort = sorted(return_list,key=lambda x:x["timestamp"],reverse=True)
+    elif sort_item == 'hot':
+        results_sort = sorted(return_list,key=lambda x:x["retweet"],reverse=True)
+    
+
+    return json.dumps(results_sort)
 
 
 @mod.route('/get_potential_hot_weibo/')
@@ -176,13 +183,34 @@ def ajax_get_potential_hot_weibo():
     task_name = request.args.get('task_name','')
     update_time = request.args.get("update_time","")
     pinyin_task_name = pinyin.get(task_name.encode('utf-8'), format='strip', delimiter="_")
+    sort_item = request.args.get('sort_item','')
     index_name = "stimulation_"+pinyin_task_name
     index_type = "stimulation_results"
     es_results = es_prediction.get(index=index_name, doc_type=index_type, id=update_time)["_source"]
     results = es_results["potential_hot_weibo"]
+    # print '184:::::::::::::',results.keys();
+    print results
+    print 'type:::::::',type(results)
+    #print json.loads(results)
+    #results = eval(results)
+    results = json.loads(results)
+    print 'type:::::::',type(results)
+    results_new = []
+    # for uid, 
+    for uid,uid_dict in results.iteritems():
+        
+        for key,value in uid_dict.iteritems():
+            if key != "user_profile" :
+                results_new.append(value)
+            if sort_item == 'time' :
+                results_sort = sorted(results_new,key=lambda x:x["timestamp"],reverse=True)
+            elif sort_item == 'hot':
+                results_sort = sorted(results_new,key=lambda x:x["retweeted"],reverse=True)
+            elif sort_item == 'poten' :
+                results_sort = sorted(results_new,key=lambda x:x["prediction_count"],reverse=True)
 
-    return results
-
+    # return results_sort
+    return json.dumps(results_sort)
 
 
 @mod.route('/get_future_user_info/')
